@@ -1,1 +1,45 @@
-test
+Student_details = zoho.crm.getRecordById("Contacts",Student_Id);
+First_Name = Student_details.get("First_Name");
+Last_Name = Student_details.get("Last_Name");
+Nationality = Student_details.get("Nationality");
+PassPort = Student_details.get("Passport_Number");
+Certificate_Number = Student_details.get("Certificate_Number");
+course_id = Student_details.getJSON("Course_Name");
+Course_Start_Date = Student_details.get("Course_Start_Date");
+Course_End_Date = Student_details.get("Course_End_Date");
+course_name = "";
+if(course_id != null)
+{
+	course_details = zoho.crm.getRecordById("Products",course_id);
+	course_name = course_details.get("Product_Name");
+}
+Account_id = Student_details.getJSON("Account_Name").get("id");
+account_details = zoho.crm.getRecordById("Accounts",Account_id);
+Number_of_Weeks = account_details.get("Number_of_Student_Weeks_Sold");
+document_id = "iqixz00a20e876d1b4e22be597fa7c03628f5";
+fieldInfo = zoho.writer.getMergeFields(document_id,"writer_connection");
+fieldsList = fieldInfo.get("fields");
+data = Map();
+//  for each  field in fieldsList
+//  { 	info field;
+//  }
+data.put("First_Name",First_Name);
+data.put("Last_Name",Last_Name);
+data.put("Passport_Number",PassPort);
+data.put("Nationality",Nationality);
+data.put("Account_Name.Number_of_Weeks",Number_of_Weeks);
+data.put("Courses",course_name);
+data.put("Certificate_Number",Certificate_Number);
+data.put("Start_Date",Course_Start_Date);
+data.put("End_Date",Course_End_Date);
+info data;
+
+filename = " Acceptance letter of " + First_Name;
+output_settings = Map();
+output_settings.put("doc_name",filename);
+response_writer = zoho.writer.mergeAndStore(document_id,data,output_settings,"writer_connection");
+file_id = response_writer.get("document_id");
+file_url = response_writer.get("document_url");
+st_map = {"LOA_Id":file_id,"LOA_Link":file_url};
+zoho.crm.updateRecord("Contacts",Student_Id,st_map);
+return "";
