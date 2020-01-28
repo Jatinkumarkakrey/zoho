@@ -42,4 +42,13 @@ file_id = response_writer.get("document_id");
 file_url = response_writer.get("document_url");
 st_map = {"LOA_Id":file_id,"LOA_Link":file_url};
 zoho.crm.updateRecord("Contacts",Student_Id,st_map);
+//Sending mail after Document Creation
+data = {"data":{{"Name":"jatin"}}};
+mergedata = Map();
+mergedata.put("merge_data",data);
+mergedata.put("subject","Letter Of Acceptance");
+//optional
+mergedata.put("message","Download the attachment");
+//optional
+info zoho.writer.mergeAndSend(loa,"pdf",email,mergedata,"writer_connection");//loa is document id
 return "";
