@@ -1,0 +1,40 @@
+param = Map();
+param.put("client_id","943648424916-t1d4oui0bklg09d4lgrjjtja9vo9socr.apps.googleusercontent.com");
+// //param.put("redirect_uri", "https://developers.google.com/oauthplayground");
+// //param.put("response_type", "code");
+// //param.put("scope", "https://www.googleapis.com/auth/spreadsheets");
+// //param.put("access_type", "offline");
+param.put("refresh_token","1//0gxpAy4EBfzQICgYIARAAGBASNwF-L9IrODZZXAvmK5sVwqDkEYjmRwB3cCpXxmQXQkR7HVyWZuZBQBq5TszwUEV0XP1IuIruskE");
+param.put("client_secret","GXkHJyfP-eQzbN59nZkQ5Tl7");
+param.put("grant_type","refresh_token");
+res = invokeurl
+[
+	url :"https://oauth2.googleapis.com/token"
+	type :POST
+	parameters:param
+];
+access_token = res.get("access_token");
+// info access_token;
+// criteria  = map();
+// criteria.put("", <OBJECT>)
+// filterview_map = map();
+// filterview_map.put("filterViewId", "");
+// filterview_map.put("criteria", "");
+// update_sheet = map();
+// update_sheet.put("filter", <OBJECT>);
+test = {"requests":{{"updateFilterView":{"filter":{"filterViewId":1810232932,"criteria":{"0":{"hiddenValues":{"xyz","ijk"}}}},"fields":"*"}}},"includeSpreadsheetInResponse":true};
+m = Map();
+m.put("data",test);
+hd = "Bearer " + access_token;
+header = Map();
+header.put("Authorization",hd);
+// header.put("Accept", "application/json");
+// header.put("Content-Type", "application/json");
+update = invokeurl
+[
+	url :"https://sheets.googleapis.com/v4/spreadsheets/13OixKJlArNfeHrpkQmPJyNZeuP7gQpFYXQEdmpcBOtk:batchUpdate"
+	type :POST
+	parameters:test.toString()
+	headers:header
+];
+info update;
