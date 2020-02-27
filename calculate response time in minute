@@ -1,0 +1,21 @@
+kpi_details = zoho.crm.getRecordById("KPI_Data",id);
+Set_to_01_New_Date_Time = kpi_details.get("Set_to_01_New_Date_Time").toTime("yyyy-MM-dd'T'HH:mm:ss");
+info Set_to_01_New_Date_Time;
+Set_to_02_Active_Date_Time = kpi_details.get("Set_to_02_Active_Date_Time").toTime("yyyy-MM-dd'T'HH:mm:ss");
+info Set_to_02_Active_Date_Time;
+week_day = Set_to_01_New_Date_Time.weekday();
+if(!(week_day == 1 || week_day == 7))
+{
+	new_date = Set_to_01_New_Date_Time.getHour();
+	//info new_date;
+	working_hour = {9,10,11,12,13,14,15,16,17};
+	if(new_date > 8 && new_date < 17)
+	{
+		response_time = (Set_to_02_Active_Date_Time - Set_to_01_New_Date_Time) / 60000;
+		info response_time;
+		mp = Map();
+		mp.put("Lead_Response_Time",response_time.toDecimal());
+		info zoho.crm.updateRecord("KPI_Data",id,mp);
+	}
+}
+//info response_time;
