@@ -1,0 +1,70 @@
+trigger handler:
+response = Map();
+response.put("action","reply");
+response.put("replies",{{"text":"Hi, I am Sam from Motif.I am here to support you."},{"text":"What are you looking for ?"}});
+response.put("suggestions",{"Capacitor","Switch Gear"});
+return response;
+
+message Handler:
+response = Map();
+msg = message.get("text");
+if(operation.equals("chat"))
+{
+	if(msg.equalsIgnoreCase("Capacitor"))
+	{
+		response = Map();
+		response.put("action","reply");
+		response.put("replies",{"Which purpose are you looking for ?"});
+		response.put("suggestions",{"1.Fan"," 2.Motor","3.Air Conditioning","4.Power Capacitor"});
+		return response;
+	}
+	else if(msg.equalsIgnoreCase("Switch Gear"))
+	{
+		response = Map();
+		response.put("action","reply");
+		response.put("replies",{"Which purpose are you looking for ?"});
+		response.put("suggestions",{"1.Panels"," 2.Starter","3.Star delta","4.Auto switch","5.Meter"});
+		return response;
+	}
+}
+if(!msg.isEmpty())
+{
+	response = Map();
+	response.put("action","context");
+	response.put("context_id","Capture_Details");
+	question1 = {"name":"first_name","replies":{"Can I know your first name?"},"input":{"type":"name"}};
+	question2 = {"name":"last_name","replies":{"Can I know your last name?"},"input":{"type":"name"}};
+	question3 = {"name":"com_name","replies":{"Can I know your Company name?"},"input":{"type":"name"}};
+	question4 = {"name":"phone","replies":{"Can I know your Phone Number"},"input":{"type":"tel"}};
+	question5 = {"name":"Email","replies":{"Can I know your Email ?"},"input":{"type":"email"}};
+	question6 = {"name":"would","replies":{"Would you like to subscribe to our News Letter ?"},"suggestions":{"Yes","No"}};
+	response.put("questions",{question1,question2,question3,question4,question5,question6});
+	return response;
+}
+return response;
+
+
+
+Context Handler:
+response = Map();
+response.put("action","context");
+response.put("context_id",context_id);
+if(context_id.equals("Capture_Details"))
+{
+	first_name = answers.get("first_name").get("text");
+	last_name = answers.get("last_name").get("text");
+	phone = answers.get("phone").get("text");
+	email = answers.get("Email").get("text");
+	com_name = answers.get("com_name").get("text");
+	mp = Map();
+	mp.put("Company",com_name);
+	mp.put("Email",email);
+	mp.put("Phone",phone);
+	mp.put("Last_Name",last_name);
+	mp.put("First_Name",first_name);
+	//info mp;
+	info zoho.crm.createRecord("leads",mp);
+	response.put("action","end");
+	response.put("replies",{"Great ! I am here to help you.Let us know if you need any help kindly contact us motif@motifcap.com."});
+}
+return response;
