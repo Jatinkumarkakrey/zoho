@@ -1,0 +1,64 @@
+kpi_details = zoho.crm.getRecordById("KPI_Data",id);
+Set_to_01_New_Date_Time = kpi_details.get("Set_to_01_New_Date_Time").toTime("yyyy-MM-dd'T'HH:mm:ss");
+Set_to_02_Active_Date_Time = kpi_details.get("Set_to_02_Active_Date_Time").toTime("yyyy-MM-dd'T'HH:mm:ss");
+week_day = Set_to_01_New_Date_Time.weekday();
+if(!(week_day == 1 || week_day == 7))
+{
+	new_date = Set_to_01_New_Date_Time.getHour();
+	if(new_date > 8 && new_date < 17)
+	{
+		get_weekdays = Set_to_01_New_Date_Time.workDaysBetween(Set_to_02_Active_Date_Time);
+		get_hour_active = Set_to_02_Active_Date_Time.getHour();
+		compare_active_date = Set_to_02_Active_Date_Time;
+		if(get_hour_active < 8)
+		{
+			addhour = 9 - get_hour_active;
+			info addhour;
+			getactiveminute = Set_to_02_Active_Date_Time.getMinutes();
+			if(getactiveminute == 0)
+			{
+				compare_active_date = Set_to_02_Active_Date_Time.addHour(addhour);
+			}
+			else
+			{
+				admin = 60 - Set_to_02_Active_Date_Time.getMinutes();
+				ad = addhour - 1;
+				compare_active_date = Set_to_02_Active_Date_Time.addMinutes(admin).addHour(ad);
+			}
+		}
+		else if(get_hour_active > 17)
+		{
+			addhour = get_hour_active - 17;
+			admin = 60 - Set_to_02_Active_Date_Time.getMinutes();
+			getactiveminute = Set_to_02_Active_Date_Time.getMinutes();
+			if(getactiveminute == 0)
+			{
+				compare_active_date = Set_to_02_Active_Date_Time.subHour(addhour);
+			}
+			else
+			{
+				compare_active_date = Set_to_02_Active_Date_Time.subMinutes(admin).subHour(addhour);
+			}
+		}
+		com_active_hour = compare_active_date.getHour();
+		if(get_weekdays == 0)
+		{
+			response_time = (compare_active_date - Set_to_01_New_Date_Time) / 60000;
+		}
+		else if(get_weekdays >= 1)
+		{
+			get_wek = get_weekdays - 1;
+			if(new_date != 16)
+			{
+				response_time = get_wek * 8 * 60 + (17 - new_date) * 60 + Set_to_01_New_Date_Time.getMinutes() + (com_active_hour - 9) * 60 + compare_active_date.getMinutes();
+			}
+			else
+			{
+				response_time = get_wek * 8 * 60 + Set_to_01_New_Date_Time.getMinutes() + (com_active_hour - 9) * 60 + compare_active_date.getMinutes();
+			}
+		}
+		mp = Map();
+		mp.put("Lead_Response_Time",response_time.toLong());
+		info zoho.crm.updateRecord("KPI_Data",id,mp);
+	}
+}
