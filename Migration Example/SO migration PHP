@@ -1,0 +1,247 @@
+<?php
+require("wp-load.php");
+$product_listing = array (
+4422349000000463122 => 'P0022',
+4422349000000463121 => 'P0023',
+4422349000000463120 => 'P0024',
+4422349000000463119 => 'P0025',
+4422349000000463118 => 'P0026',
+4422349000000463117 => 'P0028',
+4422349000000463116 => 'P0029',
+4422349000000463115 => 'P0048',
+4422349000000463114 => 'P0049',
+4422349000000463113 => 'P0051',
+4422349000000463112 => 'P0052',
+4422349000000463111 => 'P0053',
+4422349000000463110 => 'P0058',
+4422349000000463109 => 'P0060',
+4422349000000463108 => 'P0062',
+4422349000000463107 => 'P0063',
+4422349000000463106 => 'P0065',
+4422349000000463105 => 'P0069',
+4422349000000463104 => 'P0076',
+4422349000000463103 => 'P0081',
+4422349000000463102 => 'P0082',
+4422349000000463101 => 'P0083',
+4422349000000463100 => 'P0084',
+4422349000000463099 => 'P0085',
+4422349000000463098 => 'P0099',
+4422349000000463097 => 'P102',
+4422349000000463096 => 'P111',
+4422349000000463095 => 'P112',
+4422349000000463094 => 'P113',
+4422349000000463093 => 'P114',
+4422349000000463092 => 'P115',
+4422349000000463091 => 'P116',
+4422349000000463090 => 'P117',
+4422349000000463089 => 'P118',
+4422349000000463088 => 'P119',
+4422349000000463087 => 'P120',
+4422349000000463086 => 'P122',
+4422349000000463085 => 'P123',
+4422349000000463084 => 'P124',
+4422349000000463083 => 'P125',
+4422349000000463082 => 'P126',
+4422349000000463081 => 'P127',
+4422349000000463080 => 'P128',
+4422349000000463079 => 'P129',
+4422349000000463078 => 'P130',
+4422349000000463077 => 'P131',
+4422349000000463076 => 'P132',
+4422349000000463075 => 'P133',
+4422349000000463074 => 'P134',
+4422349000000463073 => 'P135',
+4422349000000463072 => 'P136',
+4422349000000463071 => 'P137',
+4422349000000463070 => 'P138',
+4422349000000463069 => 'P139',
+4422349000000463068 => 'P140',
+4422349000000463067 => 'P141',
+4422349000000463066 => 'P0040',
+4422349000000463065 => 'P0034',
+4422349000000463064 => 'P144',
+4422349000000463063 => 'P0027',
+4422349000000463062 => 'P147',
+4422349000000463061 => 'P148',
+4422349000000463060 => 'P149',
+4422349000000463059 => 'P150',
+4422349000000463058 => 'P151',
+4422349000000463057 => 'P152',
+4422349000000463056 => 'P153',
+4422349000000463055 => 'P154',
+4422349000000463054 => 'P155',
+4422349000000463053 => 'P156',
+4422349000000303089 => '5',
+4422349000000303073 => '3',
+4422349000000298058 => 'P146',
+4422349000000290742 => 'P0059',
+4422349000000290731 => '0',
+4422349000000290692 => '4');
+$product_listing = array_flip($product_listing);
+// echo "<pre>";print_r($product_listing);exit;
+$client_id= "1000.M7JZAUEWWAFF29370UMRRS8C6HKW7H";
+$client_secret = "bb523790060c71e829121157ba6db79f8ff6e4a83e";
+$refresh_token ="1000.46ddd1871f2705351f63d08a0c14c7c6.e4fd6265c5bfedd8dfc11b1bebcc2f0d";
+
+$ch = curl_init();
+curl_setopt($ch,CURLOPT_URL,"https://accounts.zoho.com/oauth/v2/token?client_id=".$client_id."&client_secret=".$client_secret."&grant_type=refresh_token&refresh_token=".$refresh_token);
+curl_setopt($ch,CURLOPT_POST, 1); //0 for a get request
+curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+$response = curl_exec($ch);
+$decoded_res = json_decode($response);
+$acc_tkn = $decoded_res->access_token;
+$err = curl_error($ch);
+curl_close($ch);
+
+$unique_zort = $wpdb->get_results("SELECT DISTINCT ZORT_SO_NUMBER FROM test_po ORDER BY id ASC LIMIT 100 OFFSET 3269");
+
+if(count($unique_zort) > 0){
+$count = 0;
+foreach ($unique_zort as $r_key => $r_value) {
+$get_data = $wpdb->get_results( "SELECT * FROM test_po where ZORT_SO_NUMBER='$r_value->ZORT_SO_NUMBER'" );
+if(count($get_data) > 0){
+$final_arr = array();
+$whole_arr = array();
+$product_list = array();
+$data   = array();
+$datetime = "";
+$whole_arr["ZORT_SO_Number"] = $get_data[0]->ZORT_SO_NUMBER;
+$whole_arr["Subject"] = $get_data[0]->ZORT_SO_NUMBER;
+$whole_arr["Status"] = "สั่งซื้อแล้ว";
+$whole_arr["Contact_Name"] = $get_data[0]->CONTACT_INTERNAL_ID;
+$whole_arr["ZORT_Sales_Owner"] = $get_data[0]->ZORT_SALES_OWNER;
+$whole_arr["ZORT_SO_Number"] = $get_data[0]->ZORT_SO_NUMBER;
+$whole_arr["Billing_Street1"] = $get_data[0]->BILLING_STREET;
+$whole_arr["SO_Date"] = $get_data[0]->SO_DATE;
+
+if($get_data[0]->TOTAL_DISCOUNT != ""){
+$whole_arr["Discount"]  = (int)$get_data[0]->TOTAL_DISCOUNT;
+}else
+{
+$whole_arr["Discount"] = 0;
+}
+
+if($get_data[0]->DELIVERY_DATE_TIME != ""){
+$explode = explode(" ", $get_data[0]->DELIVERY_DATE_TIME);
+if(count($explode) > 0){
+$datetime = $explode[0]."T".$explode[1].":00+07:00";
+}
+}
+if($datetime != ""){
+$whole_arr["Delivery_Date_Time"] = $datetime;
+}
+$whole_arr["Remark"] = $get_data[0]->REMARK;
+$whole_arr["field5"] = $get_data[0]->PAYMENT_STATUS;
+$whole_arr["field3"] = $get_data[0]->DELIVERY_METHOD;
+$whole_arr["ZORT_Created_by_Team"] = $get_data[0]->ZORT_TEAM;
+foreach ($get_data as $d_key => $d_value)
+{
+$product_arr = array();
+if (array_key_exists($d_value->PRODUCT_NAME,$product_listing))
+{
+$product_arr["product"] = array("id"=>$product_listing[$d_value->PRODUCT_NAME]);
+}
+else
+{
+$product_arr["product"] = array("id"=>4422349000000513001);
+}
+if(strpos($d_value->UNIT_PRICE, ",") !== false)
+{
+$price = str_replace(",","",$d_value->UNIT_PRICE);
+$product_arr["list_price"] = (int)$price;
+}else{
+$product_arr["list_price"] = (int)$d_value->UNIT_PRICE;
+}
+
+$product_arr["quantity"] = (int)$d_value->QTY;
+if($d_value->UNIT_DISCOUNT != ""){
+$product_arr["Discount"] = $d_value->UNIT_DISCOUNT;
+}else
+{
+$product_arr["Discount"] = 0;
+}
+
+$product_list[] = $product_arr;
+}
+$whole_arr["Product_Details"] = $product_list;
+$data[] = $whole_arr;
+$final_arr["data"] = $data;
+
+
+
+$search = curl_init();
+
+curl_setopt_array($search, array(
+CURLOPT_URL => "https://www.zohoapis.com/crm/v2/Sales_Orders/search?criteria=(ZORT_SO_Number:equals:'".$r_value->ZORT_SO_NUMBER."')",
+
+CURLOPT_RETURNTRANSFER => true,
+CURLOPT_ENCODING => "",
+CURLOPT_MAXREDIRS => 10,
+CURLOPT_TIMEOUT => 30,
+CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+CURLOPT_CUSTOMREQUEST => "GET",
+CURLOPT_HTTPHEADER => array(
+"Authorization: Zoho-oauthtoken ".$acc_tkn
+),
+));
+$Search_response = curl_exec($search);
+
+$res = json_decode($Search_response);
+
+if(empty($res)!=1)
+{
+
+
+if($res->info->count>0)
+{
+foreach ($res->data as $data)
+{
+$record_id = $data->id;
+
+echo "<pre>";print_r(json_encode($final_arr));
+$zoho_update = curl_init();
+curl_setopt($zoho_update,CURLOPT_URL,"https://www.zohoapis.com/crm/v2/Sales_Orders/".$record_id);
+curl_setopt($zoho_update, CURLOPT_CUSTOMREQUEST, "PUT");
+curl_setopt($zoho_update,CURLOPT_RETURNTRANSFER, true);
+curl_setopt($zoho_update,CURLOPT_CONNECTTIMEOUT ,3);
+//curl_setopt($zoho_upload,CURLOPT_HTTP_VERSION,CURL_HTTP_VERSION_1_1);
+curl_setopt($zoho_update,CURLOPT_TIMEOUT, 30);
+curl_setopt($zoho_update,CURLOPT_HTTPHEADER, array(
+'Authorization: Zoho-oauthtoken '.$acc_tkn,
+'Content-Type:application/json'
+));
+curl_setopt($zoho_update, CURLOPT_POSTFIELDS,json_encode($final_arr));
+$update = curl_exec($zoho_update);
+curl_close($update);
+echo "<pre>";print_r(json_decode($update));
+}
+}
+
+}
+else
+{
+
+
+$create_so = curl_init();
+curl_setopt($create_so,CURLOPT_URL,"https://www.zohoapis.com/crm/v2/Sales_Orders");
+curl_setopt($create_so,CURLOPT_POST, 1); //0 for a get request
+curl_setopt($create_so,CURLOPT_RETURNTRANSFER, true);
+curl_setopt($create_so, CURLOPT_HTTPHEADER, array('Authorization:Zoho-oauthtoken '.$acc_tkn));
+curl_setopt($create_so,CURLOPT_CONNECTTIMEOUT ,3);
+curl_setopt($create_so, CURLOPT_POSTFIELDS,json_encode($final_arr));
+curl_setopt($create_so,CURLOPT_TIMEOUT, 20);
+$create_res = curl_exec($create_so);
+echo "<pre>";print_r(json_decode($create_res));echo"<br>";echo$get_data[0]->ZORT_SO_NUMBER;
+$err = curl_error($create_so);
+curl_close($create_so);
+}
+
+
+}
+$count++;
+}
+}
+
+?>
