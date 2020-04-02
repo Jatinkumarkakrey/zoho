@@ -1,9 +1,9 @@
 <?php
 error_reporting(E_ALL & ~E_NOTICE);
 
-$client_id= "172793160875-itndungnjdlvlrlfaph7p1cld8hkmj47.apps.googleusercontent.com";
-$client_secret = "n04LYqmfm-3Z8haBKffIxozo";
-$refresh_token ="1//04Od3NU247E_kCgYIARAAGAQSNwF-L9IrMoqI2TDiA75T67EcDeqzzOrEzyzZdz-hJfwgAigd3_lyhuMGaUp1cEFrZXcCqKrOBQ8";
+$client_id= "172793160875-mmitndungnjdlvlrlfaph7p1cld8hkmj47.apps.googleusercontent.com";
+$client_secret = "n04LYqmfm-3Z8haBKffIxomzo";
+$refresh_token ="1//04Od3NU247E_kCgYIARAAGAQSNwF-L9IrMoqI2TDiA75T67EcDeqzzOrEzyzZdznn-hJfwgAigd3_lyhuMGaUp1cEFrZXcCqKrOBQ8";
 
 
 $ch = curl_init();
@@ -79,7 +79,7 @@ $attachment_id = $parts["attachmentId"];
   $get_attach = curl_init();
 
 curl_setopt_array($get_attach, array(
-  CURLOPT_URL => "https://www.googleapis.com/gmail/v1/users/jatin@insightcrew.com/messages/".$msg_id."/attachments/".$attachment_id,
+  CURLOPT_URL => "https://www.googleapis.com/gmail/v1/users/{your email}/messages/".$msg_id."/attachments/".$attachment_id,
   
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
@@ -159,9 +159,9 @@ if ($zip->open('test_new2.csv.zip', ZipArchive::CREATE) === TRUE)
     $zip->close();
 }
 
-$zoho_client_id ="1000.H5MKTQ3U4M0FNP0YUUSSEXOUFHPMZH";
-$zoho_secret_id ="3bab7c7c0cf9a0b358da088c367de6aefd9594ffdb";
-$zoho_refresh_token ="1000.92555a37266a707e733a8e6ad3870866.5d47d8e2b5cc523222588cc5d2cf3734";
+$zoho_client_id ="bb1000.H5MKTQ3U4M0FNP0YUUSSEXOUFHPMZH";
+$zoho_secret_id ="bb3bab7c7c0cf9a0b358da088c367de6aefd9594ffdb";
+$zoho_refresh_token ="bb1000.92555a37266a707e733a8e6ad3870866.5d47d8e2b5cc523222588cc5d2cf3734";
 
 $zoho_access = curl_init();
 
