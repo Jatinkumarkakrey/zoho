@@ -1,0 +1,141 @@
+param = Map();
+param.put("client_id","1000.M7JZAUEWWAFF29370UMRRS8C6HKW7H");
+param.put("client_secret","bb523790060c71e829121157ba6db79f8ff6e4a83e");
+param.put("refresh_token","1000.46ddd1871f2705351f63d08a0c14c7c6.e4fd6265c5bfedd8dfc11b1bebcc2f0d");
+param.put("grant_type","refresh_token");
+res = invokeurl
+[
+	url :"https://accounts.zoho.com/oauth/v2/token"
+	type :POST
+	parameters:param
+];
+acc_tkn = "Zoho-oauthtoken " + res.getJSON("access_token");
+tkn_header = Map();
+tkn_header.put("Authorization",acc_tkn);
+unknown_prod_id = 4422349000000513001;
+product_ids = {"P0022":4422349000000463122,"P0023":4422349000000463121,"P0024":4422349000000463120,"P0025":4422349000000463119,"P0026":4422349000000463118,"P0028":4422349000000463117,"P0029":4422349000000463116,"P0048":4422349000000463115,"P0049":4422349000000463114,"P0051":4422349000000463113,"P0052":4422349000000463112,"P0053":4422349000000463111,"P0058":4422349000000463110,"P0060":4422349000000463109,"P0062":4422349000000463108,"P0063":4422349000000463107,"P0065":4422349000000463106,"P0069":4422349000000463105,"P0076":4422349000000463104,"P0081":4422349000000463103,"P0082":4422349000000463102,"P0083":4422349000000463101,"P0084":4422349000000463100,"P0085":4422349000000463099,"P0099":4422349000000463098,"P102":4422349000000463097,"P111":4422349000000463096,"P112":4422349000000463095,"P113":4422349000000463094,"P114":4422349000000463093,"P115":4422349000000463092,"P116":4422349000000463091,"P117":4422349000000463090,"P118":4422349000000463089,"P119":4422349000000463088,"P120":4422349000000463087,"P122":4422349000000463086,"P123":4422349000000463085,"P124":4422349000000463084,"P125":4422349000000463083,"P126":4422349000000463082,"P127":4422349000000463081,"P128":4422349000000463080,"P129":4422349000000463079,"P130":4422349000000463078,"P131":4422349000000463077,"P132":4422349000000463076,"P133":4422349000000463075,"P134":4422349000000463074,"P135":4422349000000463073,"P136":4422349000000463072,"P137":4422349000000463071,"P138":4422349000000463070,"P139":4422349000000463069,"P140":4422349000000463068,"P141":4422349000000463067,"P0040":4422349000000463066,"P0034":4422349000000463065,"P144":4422349000000463064,"P0027":4422349000000463063,"P147":4422349000000463062,"P148":4422349000000463061,"P149":4422349000000463060,"P150":4422349000000463059,"P151":4422349000000463058,"P152":4422349000000463057,"P153":4422349000000463056,"P154":4422349000000463055,"P155":4422349000000463054,"P156":4422349000000463053,"00005":4422349000000303089,"00003":4422349000000303073,"P146":4422349000000298058,"P0059":4422349000000290742,"00000":4422349000000290731,"00004":4422349000000290692};
+so_list = {"IV-2020012014"};
+for each  so_no in so_list
+{
+	search_so = zoho.crm.searchRecords("Migration_Data","(Name:equals:" + so_no + ")");
+	if(search_so.size() > 0)
+	{
+		so_map = Map();
+		product_list = List();
+		data_list = List();
+		final_map = Map();
+		for each  so_data in search_so
+		{
+			product_map = Map();
+			so_map.put("ZORT_SO_Number",ifnull(so_data.getJSON("Name"),""));
+			so_map.put("Subject",ifnull(so_data.getJSON("Name"),""));
+			so_map.put("Status","สั่งซื้อแล้ว");
+			if(so_data.getJSON("Contact_Internal_ID") != null)
+			{
+				explode_cont_id = so_data.getJSON("Contact_Internal_ID").toList("_");
+				so_map.put("Contact_Name",explode_cont_id.get(1));
+			}
+			so_map.put("ZORT_Sales_Owner",ifnull(so_data.getJSON("ZORT_Sales_Owner"),""));
+			so_map.put("Billing_Street1",ifnull(so_data.getJSON("Billing_Street"),""));
+			if(so_data.getJSON("SO_Date") != "")
+			{
+				date_explode = so_data.getJSON("SO_Date").toList("/");
+				appended_d = date_explode.get(2) + "-" + date_explode.get(1) + "-" + date_explode.get(0);
+				appended_d = appended_d.subYear(543);
+				final_so_date = appended_d.toString("YYYY-MM-dd");
+				so_map.put("SO_Date",final_so_date);
+			}
+			if(so_data.getJSON("Total_Discount") != null)
+			{
+				so_map.put("Discount",so_data.getJSON("Total_Discount"));
+			}
+			else
+			{
+				so_map.put("Discount",0);
+			}
+			if(so_data.getJSON("Delivery_Date_Time") != null)
+			{
+				explode_d_time = so_data.getJSON("Delivery_Date_Time").toList(" ");
+				e_date = explode_d_time.get(0);
+				e_date = e_date.toString("dd-MM-YYYY");
+				new_date = e_date.subYear(543);
+				e_date = new_date.toString("YYYY-MM-dd");
+				e_time = explode_d_time.get(1);
+				mod_d = e_date + "T" + e_time + ":00+07:00";
+				so_map.put("Delivery_Date_Time",mod_d);
+			}
+			so_map.put("Remark",ifnull(so_data.getJSON("Remark"),""));
+			so_map.put("field5",ifnull(so_data.getJSON("Payment_Status"),""));
+			so_map.put("field3",ifnull(so_data.getJSON("Delivery_Method"),""));
+			so_map.put("ZORT_Created_by_Team",ifnull(so_data.getJSON("Zort_Team"),""));
+			if(product_ids.containKey(so_data.getJSON("Product_Code")))
+			{
+				product_map.put("product",{"id":product_ids.get(so_data.getJSON("Product_Code"))});
+			}
+			else
+			{
+				product_map.put("product",{"id":unknown_prod_id});
+			}
+			product_map.put("list_price",ifnull(so_data.get("Unit_Price"),0));
+			product_map.put("quantity",ifnull(so_data.get("Quantity"),1));
+			if(so_data.getJSON("Unit_Discount") != null)
+			{
+				product_map.put("Discount",so_data.getJSON("Unit_Discount"));
+			}
+			else
+			{
+				product_map.put("Discount",0);
+			}
+			product_list.add(product_map);
+		}
+		if(product_list.size() > 0)
+		{
+			so_map.put("Product_Details",product_list);
+		}
+		data_list.add(so_map);
+		final_map.put("data",data_list);
+		info final_map;
+		c_search_so = invokeurl
+		[
+			url :"https://www.zohoapis.com/crm/v2/Sales_Orders/search?criteria=(ZORT_SO_Number:equals:" + so_no + ")"
+			type :GET
+			headers:tkn_header
+		];
+		if(c_search_so != "")
+		{
+			// 					if(c_search_so.getJSON("data").size() > 0)
+			// 					{
+			// 						existing_so_id = c_search_so.getJSON("data").get(0).get("id");
+			// 						c_up_res = invokeurl
+			// 						[
+			// 							url :"https://www.zohoapis.com/crm/v2/Sales_Orders/" + existing_so_id
+			// 							type :PUT
+			// 							parameters:final_map.toString()
+			// 							headers:tkn_header
+			// 						];
+			// 						info c_up_res;
+			// 					}
+		}
+		else
+		{
+			c_create_res = invokeurl
+			[
+				url :"https://www.zohoapis.com/crm/v2/Sales_Orders"
+				type :POST
+				parameters:final_map.toString()
+				headers:tkn_header
+			];
+			info c_create_res;
+			if(c_create_res.getJSON("data").get(0).getJSON("code") != "SUCCESS")
+			{
+				sendmail
+				[
+					from :zoho.adminuserid
+					to :"jatin@insightcrew.com"
+					subject :"Migration error from Contact account"
+					message :"SO_NUMBER=" + so_no + " Error Message=" + c_create_res.getJSON("data").get(0).getJSON("message")
+				]
+			}
+		}
+	}
+}
