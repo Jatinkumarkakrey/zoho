@@ -1,0 +1,75 @@
+continfo = zoho.crm.getRecordById("Contacts",id);
+Email = continfo.get("Email");
+Event_nm  = continfo.getJSON("Last_Registered_Event");
+first_nm = continfo.getJSON("First_Name");
+last_nm = continfo.getJSON("Last_Name");
+	
+
+resp = zoho.creator.getRecords("arthur191","crm-reporting","All_Crm_Data","Email=\"" + Email + "\"");
+info resp;
+ form_id = resp.get(0).get("ID");
+// info id;
+Event = resp.getJSON("Events.Event_Name");
+// li = Event.toList(",");
+// for each item in  li
+// {
+// 	new_list = li.toList(" ");
+// 	for each x in new_list
+// 	{
+// 		info x;
+// 	}
+// }
+mp = Map();
+req2 = "<ZohoCreator><applicationlist><application name=\"crm-reporting\"><viewlist><view name=\"All_Crm_Data\"><update><criteria><![CDATA[(First_Name == " + first_nm + " && Last_Name == " + last_nm + ")]]></criteria><newvalues><field name='Registered_Events'><add><field name='First_Name'>" + first_nm + "</field><field name='Last_Name'>" + last_nm + "</field><field name='Email'>" + Email + "</field><field name='Event_Name'>" + Event_nm + "</field></add></field></newvalues></update></view></viewlist></application></applicationlist></ZohoCreator>";
+mp.put("XMLString",req2);
+
+mp.put("zc_ownername","arthur191");
+info mp;
+if( form_id!= null)
+{
+	ResponseMapVariable = postUrl("https://creator.zoho.com/api/xml/write?authtoken=ae5fe7e8167a36f90a484fc403c5b1f6&scope=creatorapi",mp,false);
+	info ResponseMapVariable;
+	}
+
+
+
+
+
+
+//Creator
+
+crm_email = input.Email;
+first_nm = input.First_Name;
+last_nm = input.Last_Name;
+email = input.Email;
+Event_nm = input.Event_Name;
+// mp = Map();
+// req2 = "<ZohoCreator><applicationlist><application name=\"crm-reporting\"><viewlist><view name=\"All_Crm_Data\"><update><criteria><![CDATA[(First_Name == Jatin  && Last_Name ==Test)]]></criteria><newvalues><field name='Registered_Events'><add><field name='First_Name'>" + first_nm + "</field><field name='Last_Name'>" + last_nm + "</field><field name='Email'>" + email + "</field><field name='Event_Name'>" + Event_nm + "</field></add></field></newvalues></update></view></viewlist></application></applicationlist></ZohoCreator>";
+// mp.put("XMLString",req2);
+// mp.put("zc_ownername","arthur191");
+// info mp;
+// ResponseMapVariable = postUrl("https://creator.zoho.com/api/json/write?authtoken=ae5fe7e8167a36f90a484fc403c5b1f6&scope=creatorapi&process_until_limit=true",mp,false);
+// info ResponseMapVariable;
+// sub = res.Registered_Events;
+// sub2 = res.Events;
+// if(sub == null)
+// {
+// 	info "Empty 1";
+// }
+// if(sub2 == null)
+// {
+// 	info "Empty 2";
+// }
+// col = Collection();
+// new_row = CRM_Data.Events();
+// new_row.Points =1;
+// new_row.Event_Name = "kumar";
+// col.insert(new_row);
+//  input.sub.insert(col);
+mp = Map();
+req2 = "<ZohoCreator><applicationlist><application name=\"crm-reporting\"><viewlist><view name=\"All_Crm_Data\"><update><criteria><![CDATA[(First_Name == " + first_nm + " && Last_Name == " + last_nm + ")]]></criteria><newvalues><field name='Registered_Events'><add><field name='First_Name'>" + first_nm + "</field><field name='Last_Name'>" + last_nm + "</field><field name='Email'>" + input.Email + "</field><field name='Event_Name'>" + Event_nm + "</field></add></field></newvalues></update></view></viewlist></application></applicationlist></ZohoCreator>";
+mp.put("XMLString",req2);
+mp.put("zc_ownername","arthur191");
+info mp;
+ResponseMapVariable = postUrl("https://creator.zoho.com/api/xml/write?authtoken=ae5fe7e8167a36f90a484fc403c5b1f6&scope=creatorapi",mp,false);
+info ResponseMapVariable;
