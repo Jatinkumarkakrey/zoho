@@ -1,0 +1,132 @@
+//2770343000015521005
+class = zoho.crm.getRecordById("Classes",id);
+demo = list();
+existing_student_id = list();
+exitsing_st = class.getJSON("Students");
+if(!exitsing_st.isNull())
+{
+	for each  student_1 in exitsing_st
+	{
+		exit_map = Map();
+		student_name1 = student_1.getJSON("Student_Name").get("id");
+		existing_student_id.add(student_name1);
+		Certificate_Link_1 = student_1.getJSON("Certificate_Link");
+		Email_1 = student_1.getJSON("Email");
+		Payment_Made = student_1.get("Payment_Made");
+		Status_1 = student_1.getJSON("Status");
+		Visa_checked_by = student_1.getJSON("Visa_checked_by");
+		Visa_Checked = student_1.get("Visa_Checked");
+		exit_map.put("Student_Name",student_name1);
+		exit_map.put("Certificate_Link",Certificate_Link_1);
+		exit_map.put("Email",Email_1);
+		exit_map.put("Payment_Made",Payment_Made);
+		exit_map.put("Status",Status_1);
+		exit_map.put("Visa_checked_by",Visa_checked_by);
+		exit_map.put("Visa_Checked",Visa_Checked);
+		demo.add(exit_map);
+		return_msg = "Student Already Added !!!";
+	}
+}
+Owner = class.getJSON("Owner").getJSON("email");
+Name = class.getJSON("Name");
+Start_Date = class.getJSON("Start_Date");
+End_Date = class.getJSON("End_Date");
+Course_Type = class.getJSON("Course_Type");
+Class_Level = class.getJSON("Class_Level");
+Territory = class.getJSON("Territory");
+cnt = 0;
+num_list = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110};
+offset = 0;
+limit = 200;
+for each  x in num_list
+{
+	query = "select Email,Territory ,Starting_Level from Contacts where Course_Type ='" + Course_Type + "' and Course_Start_Date between '" + Start_Date + "' and '" + End_Date + "' ";
+	mapa_post = Map();
+	mapa_post.put("select_query",query);
+	re = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/coql"
+		type :POST
+		parameters:mapa_post.toString()
+		connection:"crm_modue"
+	];
+	return_msg = "";
+	if(re.isNull())
+	{
+		return_msg = "No Student Found matching this criteria ";
+	}
+	else
+	{
+		for each  student in re.getJSON("data")
+		{
+			info student;
+			terr = student.getJSON("Territory");
+			Starting_Level = student.getJSON("Starting_Level");
+			info Starting_Level;
+			if(terr == Territory && Starting_Level == Class_Level)
+			{
+				cnt = cnt + 1;
+				if(cnt < 100)
+				{
+					student_id = student.getJSON("id");
+					if(!existing_student_id.contains(student_id))
+					{
+						info "found";
+						student_id = student.getJSON("id");
+						email = student.getJSON("Email");
+						sub = Map();
+						sub.put("Email",email);
+						sub.put("Student_Name",student_id);
+						demo.add(sub);
+						return_msg = "Student Added Successfully";
+					}
+				}
+			}
+		}
+		offset = offset + limit;
+		if(cnt == 100)
+		{
+			return_msg = " Firts 100 Students Added Successfully";
+			break;
+		}
+		if(re.getJSON("data").size() < limit)
+		{
+			break;
+		}
+	}
+}
+if(demo.size() > 0)
+{
+	data = Map();
+	data.put("id",id);
+	data.put("Student_Added",true);
+	data.put("Students",demo);
+	list2 = list();
+	list2.add(data);
+	data1 = Map();
+	data1.put("data",list2);
+	data1.put("trigger",{"workflow"});
+	json = Map();
+	json.put("JSONString",data1);
+	info data1;
+	subform = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/Classes"
+		type :PUT
+		parameters:data1.toString()
+		connection:"crm_modue"
+	];
+	info subform;
+}
+else
+{
+	return_msg = "No Student Found matching this criteria ";
+}
+sendmail
+[
+	from :zoho.adminuserid
+	to :Owner
+	subject :"Print Register for class " + Name
+	message :"Hi,<br> Students have been added in class " + Name + ". Kindly Print Register.<br>Thanks"
+]
+return return_msg;
