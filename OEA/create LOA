@@ -1,0 +1,87 @@
+con_details = zoho.crm.getRecordById("Contacts",Student_id);
+//info Deal_details;
+Territories = con_details.get("Territory");
+// Contact_Name = Deal_details.getJSON("Contact_Name").get("id");
+// name = Deal_details.getJSON("Contact_Name").get("name");
+// Student_details = zoho.crm.getRecordById("Contacts",Contact_Name);
+Date_of_Birth = con_details.get("Date_of_Birth");
+First_Name = con_details.get("First_Name");
+Last_Name = con_details.get("Last_Name");
+full_name = First_Name + " " + Last_Name;
+Nationality = con_details.get("Nationality");
+PassPort = con_details.get("Passport_Number");
+Certificate_Number = con_details.get("Certificate_Number");
+Course_Duration_Weeks = con_details.get("Course_Duration_Weeks");
+Course_Start_Date1 = con_details.get("Course_Start_Date");
+if(Course_Start_Date1 != null)
+{
+	Course_Start_Date = con_details.get("Course_Start_Date").toString("dd-MM-yyyy");
+}
+Course_End_Date1 = con_details.get("Course_End_Date");
+if(Course_End_Date1 != null)
+{
+	Course_End_Date = con_details.get("Course_End_Date").toString("dd-MM-yyyy");
+}
+course_name = con_details.get("Course_Type");
+// Account_id = Student_details.getJSON("Account_Name").get("id");
+// account_details = zoho.crm.getRecordById("Accounts",Account_id);
+data = Map();
+if(Territories == "Cape Town")
+{
+	document_id = "8ywjib87e6ab8c16746178d898dd8b58988f3";
+	data.put("Contact_Name",full_name);
+	//data.put("Last_Name",Last_Name);
+	data.put("Passport_Number",PassPort);
+	data.put("Nationality",Nationality);
+	data.put("Course_Duration_Weeks",Course_Duration_Weeks);
+	data.put("Course_Type",course_name);
+	data.put("Contact_Name.Certificate_Number",Certificate_Number);
+	data.put("Start_Date_Monday",Course_Start_Date);
+	data.put("End_date",Course_End_Date);
+}
+else
+{
+	host_Family_id = con_details.getJSON("Vendor_Name");
+	if(host_Family_id != null)
+	{
+		host_id = con_details.getJSON("Vendor_Name").get("id");
+		h_detail = zoho.crm.getRecordById("Vendors",host_id);
+		Vendor_Name = h_detail.getJSON("Vendor_Name");
+		Mobile = h_detail.getJSON("Mobile");
+		Area = h_detail.getJSON("Area");
+		Street = h_detail.getJSON("Street");
+		Email = h_detail.getJSON("Email");
+	}
+	document_id = "6caqi6d20e4bd284f42e39cebad3f44312738";
+	data.put("Deal_Name",full_name);
+	data.put("Contact_Name.Date_of_Birth",Date_of_Birth);
+	data.put("Course_Type",course_name);
+	data.put("Passport_Number",PassPort);
+	data.put("Start_Date_Monday",Course_Start_Date);
+	data.put("End_date",Course_End_Date);
+	data.put("Course_Duration_Weeks",Course_Duration_Weeks);
+	data.put("Host_Family.Vendor_Name",Vendor_Name);
+	data.put("Host_Family.Area",Area);
+	data.put("Host_Family.Street",Street);
+	data.put("Host_Family.Mobile",Mobile);
+	data.put("Host_Family.Email",Email);
+}
+fieldInfo = zoho.writer.getMergeFields(document_id,"writer_connection");
+fieldsList = fieldInfo.get("fields");
+for each  field in fieldsList
+{
+	info field;
+}
+info data;
+filename = " Acceptance letter of " + First_Name;
+output_settings = Map();
+output_settings.put("doc_name",filename);
+output_settings.put("folder_id","j1nib58afd47a8dd04800be1c735a3ec7ff58");
+response_writer = zoho.writer.mergeAndStore(document_id,data,output_settings,"writer_connection");
+info response_writer;
+file_id = response_writer.get("document_id");
+file_url = response_writer.get("document_url");
+st_map = {"LOA_Id":file_id,"LOA_Link":file_url};
+zoho.crm.updateRecord("Contacts",Student_id,st_map);
+openUrl(file_url,"open window");
+return "";
