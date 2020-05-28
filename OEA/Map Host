@@ -1,0 +1,209 @@
+contact_details = zoho.crm.getRecordById("Contacts",Deal_id);
+Date_of_Birth = contact_details.get("Date_of_Birth");
+current_date = zoho.currentdate;
+Territories = contact_details.getJSON("Territory");
+host_city_map = Map();
+host_city_map.put("Oxford","UK");
+host_city_map.put("Cape Town","Cape Town");
+//age = Date_of_Birth.yearsBetween(current_date);
+// Contact_id = deal.getJSON("Contact_Name").get("id");
+// contact_details = zoho.crm.getRecordById("Contacts",Contact_id);
+student_smoking = contact_details.get("Smokers");
+Accept_With_Children = contact_details.get("Accept_With_Children");
+Any_critical_allergies = contact_details.get("Any_critical_allergies");
+Are_you_ok_with_pet = contact_details.get("Are_you_ok_with_pet");
+Arrival_date = contact_details.get("Arrival_date");
+departure_dates = contact_details.get("departure_dates");
+Food_Preference = contact_details.get("Food_Preference");
+Gender = contact_details.get("Sex");
+host_Food_Preference = Food_Preference;
+query = "select Host_City,Mobile , Vendor_Name from Vendors where Pets!= '" + Are_you_ok_with_pet + "' ";
+query1 = "select Host_City,Mobile , Vendor_Name from Vendors where Pets= '" + Are_you_ok_with_pet + "' ";
+// if(Accept_With_Children == "No")
+// {
+// 	host_No_of_Children = 0;
+// 	query = query + " and  No_of_Children != '" + host_No_of_Children + "' ";
+// 	query1 = query1 + " and  No_of_Children = '" + host_No_of_Children + "' ";
+// }
+if(student_smoking == "Yes")
+{
+	query = query + " and Accept_Smokers='NO'  ";
+	query1 = query1 + " and Accept_Smokers='YES'  ";
+}
+// if(age < 18)
+// {
+// 	host_Accept_Under_18s = "YES";
+// 	query = query + " and Accept_Under_18s= '" + host_Accept_Under_18s + "' ";
+// }
+// if(Gender == "Male")
+// {
+// 	host_Gender_Preference = "Indifferent";
+// 	query = query + " and Gender_Preference= '" + host_Gender_Preference + "' ";
+// }
+google_list = list();
+num_list = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110};
+// num_list = {1,2};
+offset = 0;
+limit = 200;
+for each  x in num_list
+{
+	query1 = query1 + " limit " + offset + "," + limit;
+	mapa = Map();
+	mapa.put("select_query",query1);
+	res_matching_Family = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/coql"
+		type :POST
+		parameters:mapa.toString()
+		connection:"crm_modue"
+	];
+	demo = list();
+	for each  match in res_matching_Family.getJSON("data")
+	{
+		hos_c = match.getJSON("Host_City");
+		cp = " ";
+		if(hos_c.isNull())
+		{
+			cp = host_city_map.getJSON(hos_c);
+		}
+		if(Territories == cp)
+		{
+			if(Accept_With_Children == "No")
+			{
+				Children = match.getJSON("Children");
+				if(Children == "0")
+				{
+					match_Host_Family_Name = match.getJSON("Vendor_Name");
+					//info "here matching" +match_Host_Family_Name;
+					Host_Family = match.getJSON("id");
+					Host_City = match.getJSON("Host_City");
+					Mobile = match.getJSON("Mobile");
+					sub = Map();
+					sub.put("Host_City",Host_City);
+					sub.put("Host_Family",Host_Family);
+					sub.put("Mobile",Mobile);
+					demo.add(sub);
+				}
+			}
+			else
+			{
+				match_Host_Family_Name = match.getJSON("Vendor_Name");
+				//info "here matching" +match_Host_Family_Name;
+				Host_Family = match.getJSON("id");
+				Host_City = match.getJSON("Host_City");
+				Mobile = match.getJSON("Mobile");
+				sub = Map();
+				sub.put("Host_City",Host_City);
+				sub.put("Host_Family",Host_Family);
+				sub.put("Mobile",Mobile);
+				demo.add(sub);
+			}
+		}
+	}
+	data = Map();
+	data.put("id",Deal_id);
+	data.put("Host_Availability",demo);
+	list2 = list();
+	list2.add(data);
+	data1 = Map();
+	data1.put("data",list2);
+	data1.put("trigger",{});
+	json = Map();
+	json.put("JSONString",data1);
+	info data1;
+	subform = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/Contacts"
+		type :PUT
+		parameters:data1.toString()
+		connection:"crm_modue"
+	];
+	info subform;
+	query = query + " limit " + offset + "," + limit;
+	mapa_post = Map();
+	mapa_post.put("select_query",query);
+	re = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/coql"
+		type :POST
+		parameters:mapa_post.toString()
+		connection:"crm_modue"
+	];
+	//Host_Family_Name = re.getJSON("data").getJSON("Vendor_Name");
+	// info  Host_Family_Name;
+	for each  res in re.getJSON("data")
+	{
+		hos_c1 = res.getJSON("Host_City");
+		cp1 = " ";
+		if(hos_c1.isNull())
+		{
+			cp1 = host_city_map.getJSON(hos_c1);
+		}
+		if(Territories != cp)
+		{
+			if(Accept_With_Children == "No")
+			{
+				Children = match.getJSON("Children");
+				if(Children != "0")
+				{
+					Host_Family_Name = res.getJSON("Vendor_Name");
+					//  info "here not matching"+Host_Family_Name;
+					google_list.add(Host_Family_Name);
+				}
+			}
+			else
+			{
+				Host_Family_Name = res.getJSON("Vendor_Name");
+				//  info "here not matching"+Host_Family_Name;
+				google_list.add(Host_Family_Name);
+			}
+		}
+	}
+	offset = offset + limit;
+	if(re.getJSON("data").size() < limit)
+	{
+		break;
+	}
+}
+//info google_list;
+param = Map();
+param.put("client_id","943648424916-t1d4oui0bklg09d4lgrjjtja9vo9socr.apps.googleusercontent.com");
+// //param.put("redirect_uri", "https://developers.google.com/oauthplayground");
+// //param.put("response_type", "code");
+// //param.put("scope", "https://www.googleapis.com/auth/spreadsheets");
+// //param.put("access_type", "offline");
+param.put("refresh_token","1//0gxpAy4EBfzQICgYIARAAGBASNwF-L9IrODZZXAvmK5sVwqDkEYjmRwB3cCpXxmQXQkR7HVyWZuZBQBq5TszwUEV0XP1IuIruskE");
+param.put("client_secret","GXkHJyfP-eQzbN59nZkQ5Tl7");
+param.put("grant_type","refresh_token");
+res = invokeurl
+[
+	url :"https://oauth2.googleapis.com/token"
+	type :POST
+	parameters:param
+];
+access_token = res.get("access_token");
+// info access_token;
+// criteria  = map();
+// criteria.put("", <OBJECT>)
+// filterview_map = map();
+// filterview_map.put("filterViewId", "");
+// filterview_map.put("criteria", "");
+// update_sheet = map();
+// update_sheet.put("filter", <OBJECT>);
+test = {"requests":{{"updateFilterView":{"filter":{"filterViewId":1810232932,"criteria":{"0":{"hiddenValues":google_list}}},"fields":"*"}}},"includeSpreadsheetInResponse":true};
+m = Map();
+m.put("data",test);
+hd = "Bearer " + access_token;
+header = Map();
+header.put("Authorization",hd);
+// header.put("Accept", "application/json");
+// header.put("Content-Type", "application/json");
+update = invokeurl
+[
+	url :"https://sheets.googleapis.com/v4/spreadsheets/13OixKJlArNfeHrpkQmPJyNZeuP7gQpFYXQEdmpcBOtk:batchUpdate"
+	type :POST
+	parameters:test.toString()
+	headers:header
+];
+openUrl("https://crm.zoho.com/crm/org653817237/tab/WebTab1","open window");
+return "";
