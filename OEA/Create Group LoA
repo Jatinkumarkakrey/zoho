@@ -1,0 +1,153 @@
+deal = zoho.crm.getRecordById("Deals",Deal_id);
+//2770343000011989024
+Start_Date_Monday = deal.getJSON("Start_Date_Monday");
+Territories = deal.getJSON("Territories");
+End_date = deal.getJSON("End_date");
+dt = "( " + Start_Date_Monday + " to " + End_date + " )";
+Group_Name = deal.getJSON("Group_Name");
+Group_student = zoho.crm.searchRecords("Deals_X_Contacts","(Group_Student:equals:" + Deal_id + ")");
+name_list = list();
+Host = list();
+host_address = list();
+post_code = list();
+phone = list();
+email = list();
+count = 0;
+return_msg = "";
+if(Group_student.isEmpty())
+{
+	return_msg = "No Student in this Group";
+}
+else
+{
+	for each  st in Group_student
+	{
+		student_id = st.getJSON("Group_Students").get("id");
+		student_name = st.getJSON("Group_Students").getJSON("name");
+		if(student_name.isNull())
+		{
+			name_list.add("N/A");
+		}
+		else
+		{
+			name_list.add(student_name);
+		}
+		get_contact = zoho.crm.getRecordById("Contacts",student_id);
+		Vendor_Name = get_contact.getJSON("Vendor_Name");
+		if(Vendor_Name.isNull())
+		{
+			Host.add("N/A");
+		}
+		else
+		{
+			ven = get_contact.getJSON("name");
+			Host.add(ven);
+		}
+		host_id = get_contact.getJSON("Vendor_Name").get("id");
+		host_details = zoho.crm.getRecordById("Vendors",host_id);
+		Email = host_details.getJSON("Email");
+		if(Email.isNull())
+		{
+			email.add("N/A");
+		}
+		else
+		{
+			email.add(Email);
+		}
+		Mobile = host_details.getJSON("Mobile");
+		if(Mobile.isNull())
+		{
+			phone.add("N/A");
+		}
+		else
+		{
+			phone.add(Mobile);
+		}
+		Zip_Code = host_details.getJSON("Zip_Code");
+		if(Zip_Code.isNull())
+		{
+			post_code.add("N/A");
+		}
+		else
+		{
+			post_code.add(Zip_Code);
+		}
+		Area = host_details.getJSON("Area");
+		if(Area.isNull())
+		{
+			host_address.add("N/A");
+		}
+		else
+		{
+			host_address.add(Area);
+		}
+	}
+}
+li = {1,2,3,4,5,6,7,8,9,10};
+cnt = 0;
+for each  x in li
+{
+	if(name_list.size() < 10)
+	{
+		name_list.add(" ");
+		email.add(" ");
+		phone.add(" ");
+		Host.add(" ");
+		post_code.add(" ");
+		host_address.add(" ");
+	}
+	else
+	{
+		break;
+	}
+}
+document_id = "km3ix1b4ac207a94e4266a2f13a8f187304b8";
+count = 0;
+counter = 0;
+data = Map();
+fieldInfo = zoho.writer.getMergeFields(document_id,"writer_connection");
+fieldsList = fieldInfo.get("fields");
+for each  field in fieldsList
+{
+	count = count + 1;
+	if(count % 6 == 1)
+	{
+		data.put(field,name_list.get(counter));
+	}
+	if(count % 6 == 2)
+	{
+		data.put(field,Host.get(counter));
+	}
+	if(count % 6 == 3)
+	{
+		data.put(field,host_address.get(counter));
+	}
+	if(count % 6 == 4)
+	{
+		data.put(field,post_code.get(counter));
+	}
+	if(count % 6 == 5)
+	{
+		data.put(field,phone.get(counter));
+	}
+	if(count % 6 == 0)
+	{
+		data.put(field,email.get(counter));
+		counter = counter + 1;
+	}
+	//counter = counter + 1;
+	return_msg = "Group COA create Successfully! ";
+}
+info data;
+filename = "Confirmation of Accommodation of Group  " + Group_Name;
+output_settings = Map();
+output_settings.put("doc_name",filename);
+output_settings.put("folder_id","j1nib58afd47a8dd04800be1c735a3ec7ff58");
+response_writer = zoho.writer.mergeAndStore(document_id,data,output_settings,"writer_connection");
+info response_writer;
+file_id = response_writer.get("document_id");
+file_url = response_writer.get("document_url");
+st_map = {"COA_ID":file_id,"COA_link":file_url};
+zoho.crm.updateRecord("Deals",Deal_id,st_map);
+openUrl(file_url,"open window");
+return return_msg;
