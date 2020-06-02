@@ -48,7 +48,7 @@ Event_nm = input.Event_Name;
 // mp.put("XMLString",req2);
 // mp.put("zc_ownername","*******");
 // info mp;
-// ResponseMapVariable = postUrl("https://creator.zoho.com/api/json/write?authtoken=ae5fe7e8167a36f90a484fc403c5b1f6&scope=creatorapi&process_until_limit=true",mp,false);
+// ResponseMapVariable = postUrl("https://creator.zoho.com/api/json/write?authtoken=**********6&scope=creatorapi&process_until_limit=true",mp,false);
 // info ResponseMapVariable;
 // sub = res.Registered_Events;
 // sub2 = res.Events;
@@ -71,5 +71,5 @@ req2 = "<ZohoCreator><applicationlist><application name=\"crm-reporting\"><viewl
 mp.put("XMLString",req2);
 mp.put("zc_ownername","********");
 info mp;
-ResponseMapVariable = postUrl("https://creator.zoho.com/api/xml/write?authtoken=a484fc403c5b1f6&scope=creatorapi",mp,false);
+ResponseMapVariable = postUrl("https://creator.zoho.com/api/xml/write?authtoken=*************6&scope=creatorapi",mp,false);
 info ResponseMapVariable;
