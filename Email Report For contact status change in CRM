@@ -1,0 +1,167 @@
+current_date = zoho.currentdate;
+compare_date = current_date.subDay(7).toString("yyyy-MM-dd");
+//info compare_date;
+sale_list = list();
+sale_email = list();
+sale_name = list();
+user = invokeurl
+[
+	url :"https://www.zohoapis.com/crm/v2/users"
+	type :GET
+	connection:"crm_connection"
+];
+salesperson = user.getJSON("users");
+for each  sale in salesperson
+{
+	role = sale.getJSON("role").getJSON("name");
+	status = sale.getJSON("status");
+	if(role == "Sales Person" && status == "active")
+	{
+		sale_id = sale.getJSON("id");
+		email = sale.getJSON("email");
+		name = sale.getJSON("first_name") + " " + sale.getJSON("last_name");
+		sale_list.add(sale_id);
+		sale_email.add(email);
+		sale_name.add(name);
+	}
+}
+count = 0;
+saleperson_not_update = list();
+saleperson_not_update_string = "";
+for each  sale in sale_list
+{
+	count = count + 1;
+	inx = count - 1;
+	num_list = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110};
+	//num_list1 = {1,2};
+	offset = 0;
+	limit = 200;
+	stat1 = list();
+	stat2 = list();
+	for each  num in num_list
+	{
+		query = "select Last_Name ,First_Name , Date_of_Agency_status_update ,PBS_Status ,Owner from Contacts where Date_of_Agency_status_update < '" + compare_date + "'  and Owner = '" + sale + "' limit " + offset + "," + limit;
+		//query = "select Last_Name ,First_Name , Date_of_Agency_status_update ,PBS_Status ,Owner from Contacts where Date_of_Agency_status_update <= '" + compare_date + "'  and Owner = '853743000034947032' limit " + offset + "," + limit;
+		mapa_post = Map();
+		mapa_post.put("select_query",query);
+		record_data = invokeurl
+		[
+			url :"https://www.zohoapis.com/crm/v2/coql"
+			type :POST
+			parameters:mapa_post.toString()
+			connection:"crm_connection"
+		];
+		up_rec_list = List();
+		if(!record_data.isNull())
+		{
+			stat1_store = "";
+			stat2_store = "";
+			nm = "";
+			cn = 0;
+			tot = 0;
+			for each  record in record_data.getJSON("data")
+			{
+				tot = tot + 1;
+				email_management_string = "";
+				variable_to_store_mail = "";
+				con_id = record.getJSON("id");
+				con_link = "https://crm.zoho.com/crm/org26683498/tab/Contacts/" + con_id;
+				//info con_link;
+				stat = record.getJSON("PBS_Status");
+				email = record.getJSON("First_Name") + " " + record.getJSON("Last_Name") + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + record.getJSON("Date_of_Agency_status_update") + "<br>";
+				variable_to_store_mail = variable_to_store_mail + "<tr><td><a href='" + con_link + "'>" + record.getJSON("First_Name") + " " + record.getJSON("Last_Name") + "</a></td><td>" + record.getJSON("Date_of_Agency_status_update") + "</td></tr>";
+				owner = record.getJSON("Owner").getJSON("id");
+				//info stat;
+				if(stat == "Contacted - PF Follow Up")
+				{
+					stat1.add(email);
+					stat1_store = stat1_store + variable_to_store_mail;
+					email_management = sale_name.get(inx) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + email;
+					email_management_string = email_management_string + "<tr><td>" + sale_name.get(inx) + "</td> " + "<td><a href='" + con_link + "'>" + record.getJSON("First_Name") + " " + record.getJSON("Last_Name") + "</a></td><td>" + record.getJSON("Date_of_Agency_status_update") + "</td></tr>";
+					saleperson_not_update.add(email_management);
+					saleperson_not_update_string = saleperson_not_update_string + email_management_string;
+					cn = cn + 1;
+				}
+				if(stat == "PBS Active")
+				{
+					stat2.add(email);
+					stat2_store = stat2_store + variable_to_store_mail;
+					email_management = sale_name.get(inx) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + email;
+					email_management_string = email_management_string + "<tr><td>" + sale_name.get(inx) + "</td> " + "<td><a href='" + con_link + "'>" + record.getJSON("First_Name") + " " + record.getJSON("Last_Name") + "</a></td><td>" + record.getJSON("Date_of_Agency_status_update") + "</td></tr>";
+					saleperson_not_update.add(email_management);
+					saleperson_not_update_string = saleperson_not_update_string + email_management_string;
+					cn = cn + 1;
+				}
+				// 				else
+				// 				{
+				// 					stat1.add(email);
+				// 					stat1_store = stat1_store + variable_to_store_mail;
+				// 				}
+				nm = nm + sale_name.get(inx) + " " + record.getJSON("First_Name") + " " + record.getJSON("Last_Name") + ",";
+			}
+			offset = offset + limit;
+			if(record_data.getJSON("data").size() < limit)
+			{
+				info "break";
+				break;
+			}
+		}
+		if(record_data.isNull())
+		{
+			break;
+		}
+	}
+	saleperson_email = "Hi " + sale_name.get(inx) + ",<br><br>" + "Here is your active client and lead list for " + zoho.currentdate + "<br>";
+	if(!stat1.isEmpty() || !stat2.isEmpty())
+	{
+		full_email = " ";
+		if(!stat1.isEmpty())
+		{
+			stat1msg = "Status : Contacted - PF Status  <br>" + stat1.size() + " Contacts<br><table style='width: 100%; font-size: 10pt;' border='0.1' cellspacing='2' cellpadding='2' ><tbody><tr><th style='text-align:left;'>Name</th><th style='text-align:left;'>Status Updated</th></tr>" + stat1_store + "</tbody><br>";
+			full_email = full_email + stat1msg;
+		}
+		if(!stat2.isEmpty())
+		{
+			//stat2msg = "Status : PBS Active <br>" + stat2.size()+ " Contacts <br>" +"Name&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Status Updated <br>"+ stat2.toString();
+			stat2msg = "Status : PBS Active  <br>" + stat2.size() + " Contacts<br><table style='width: 100%; font-size: 10pt; cellspacing='2' cellpadding='2' '><tbody><tr><th style='text-align:left;'>Name</th><th  style='text-align:left;'>Status Updated</th</tr>" + stat2_store + "</tbody><br>";
+			full_email = full_email + stat2msg;
+		}
+		sender_email_address = sale_email.get(inx);
+		sendmail
+		[
+			from :zoho.adminuserid
+			to :sender_email_address
+			subject :"Contacts with no status change in last 7 days"
+			message :saleperson_email + full_email
+		]
+		// 				sendmail
+		// 		        [
+		// 		        	from :zoho.adminuserid
+		// 		        	to: "Jatin@insightcrew.com"
+		// 		        	subject: "Contacts with no status change in last 7 days"
+		// 		        	message :saleperson_email + full_email
+		// 		        ]
+		info cn;
+		info tot;
+	}
+}
+if(!saleperson_not_update.isEmpty())
+{
+	msg_send_managment = "<br><table style='width: 100%; font-size: 10pt; cellspacing='2' cellpadding='2'><tr><th style='text-align:left;' '>Salesperson</th><th style='text-align:left;'>Contact</th><th style='text-align:left;'>Status Updated</th></tr><tbody>" + saleperson_not_update_string + "</tbody><br>";
+	sendmail
+	[
+		from :zoho.adminuserid
+		to :"nick@ifindproperty.co.nz"
+		subject :"Salesperson's Contacts with no status change in last 7 days"
+		message :msg_send_managment
+	]
+	// 		sendmail
+	// 		[
+	// 			from :zoho.adminuserid
+	// 			to :"Jatin@insightcrew.com"
+	// 			subject :"Salesperson's Contacts with no status change in last 7 days"
+	// 			message :msg_send_managment
+	// 		]
+	//info msg_send_managment;
+}
+//info saleperson_email + full_email;
