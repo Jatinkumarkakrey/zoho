@@ -1,0 +1,63 @@
+num_list = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110};
+//num_list = {1,2};
+ for each x in num_list
+ {
+	 response = invokeUrl [
+    url : " https://books.zoho.com/api/v3/items?page="+x+"&per_page=200&organization_id=702134731"
+    type : GET
+  
+    connection : "tes"
+];
+items = response.get("items");
+if(!items.isNull())
+{
+	for each itm in items
+	{
+		
+		item_name = itm.get("item_name");
+		//item_name = " abc(12332(jatin121" ;
+		if(!item_name.contains("*"))
+		{
+			if(item_name.contains("("))
+		{
+			last_idx = item_name.lastIndexOf("(");
+			new = item_name.subText(last_idx);
+			
+			new = new.removeAllAlpha();
+			if(!new.isNull())
+			{
+				
+				item_id = itm.get("item_id");
+				item_name_up = itm.get("item_name");
+				item_name_up = "* "+item_name_up;
+				up = Map();
+				cst = {"customfield_id": "2093959000006259926","value":"Yes"};
+				cst_lst =list();
+				cst_lst.add(cst);
+				
+				up.put("name", item_name_up);
+				up.put("custom_fields", cst_lst);
+				info up;
+				info zoho.books.updateRecord("items", "702134731", item_id, up);
+			}
+			
+		}
+		
+		}
+		
+		
+		
+	}
+}
+has_more_page = response.get("page_context").get("has_more_page");
+if(has_more_page!=true)
+{
+	info "Last Page Break";
+	Break;
+}
+else
+{
+	info "More Pages....";
+}
+	 
+ }
