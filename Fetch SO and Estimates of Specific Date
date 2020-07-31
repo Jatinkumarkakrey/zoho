@@ -1,0 +1,159 @@
+// date1 = {"2020-07-30","2020-07-29","2020-07-28","2020-07-27","2020-07-26","2020-07-25","2020-07-24","2020-07-23","2020-07-22"};
+// sum = 0;
+// itm_list = list();
+// itm_id = list();
+// So_list = list();
+// EMail = "";
+// cnt = 0;
+// for each  dt in date1
+// {
+	
+	
+// 	get_so = invokeurl
+// 	[
+// 		url :"https://books.zoho.com/api/v3/salesorders?page=1&per_page=200&date=" + dt + "&organization_id=702134731"
+// 		type :GET
+// 		connection:"tes"
+// 	];
+// 	so_all = get_so.get("salesorders");
+
+// 	if(!so_all.isEmpty())
+// 	{
+// 			for each  so in so_all
+// 	{
+// 		cnt = cnt + 1;
+// 		So_Mail = "<br><br> Serial Number " + cnt + "<br>";
+// 	itm_mail = "";
+// 		salesorder_id = so.getJSON("salesorder_id");
+// 		So_list.add(salesorder_id);
+// 		salesorder_number = so.getJSON("salesorder_number");
+// 		so_de = zoho.books.getRecordsByID("salesorders","702134731",salesorder_id);
+// 		salesorder = so_de.get("salesorder");
+// 		line_items = salesorder.get("line_items");
+// 		//info line_items;
+// 		for each  itm in line_items
+// 		{
+// 			Mail = "";
+// 			name = itm.get("name");
+// 			item_id = itm.get("item_id");
+// 			//info itm_id
+// 			if(!itm_id.contains(item_id))
+// 			{
+// 				itm_list.add(name);
+// 				itm_id.add(item_id);
+// 			}
+// 			Mail = item_id + "  " + name + "<br>";
+// 			//info Mail;
+// 			itm_mail = itm_mail + Mail;
+// 			//info So_Mail;
+// 		}
+// 		So_Mail = So_Mail + "SO ID " + salesorder_id + " S0 Number" + salesorder_number + "So Date" + dt + "<br>" + itm_mail;
+// 		EMail = EMail + So_Mail;
+// 		// 		if(cnt == 2)
+// 		// 		{
+// 		// 			break;
+// 		// 		}
+// 	}
+		
+// 	}
+// 	has_more_page = get_so.get("page_context").get("has_more_page");
+// 	//info "has_more_page " +has_more_page;
+// }
+// sendmail
+// [
+// 	from :zoho.adminuserid
+// 	to :"Jatin@insightcrew.com"
+// 	subject :"SO Created From 22 JULY to 30 JULY"
+// 	message :EMail
+// ]
+// sendmail
+// [
+// 	from :zoho.adminuserid
+// 	to :"Jatin@insightcrew.com"
+// 	subject :"Unique item list and SO"
+// 	message :"SO LIST " + So_list.toString() + "<br> ITEM LIST" + itm_id.toString() + "<br> Item Name" + itm_list.toString()
+// ]
+
+
+
+
+//*******************************************************************Estimate
+
+
+
+
+date1 = {"2020-07-30","2020-07-29","2020-07-28","2020-07-27","2020-07-26","2020-07-25","2020-07-24","2020-07-23","2020-07-22"};
+sum = 0;
+itm_list = list();
+itm_id = list();
+So_list = list();
+EMail = "";
+cnt = 0;
+for each  dt in date1
+{
+	
+	
+	get_so = invokeurl
+	[
+		url :"https://books.zoho.com/api/v3/estimates?page=1&per_page=200&date=" + dt + "&organization_id=702134731"
+		type :GET
+		connection:"tes"
+	];
+	so_all = get_so.get("estimates");
+
+	if(!so_all.isEmpty())
+	{
+			for each  so in so_all
+	{
+		cnt = cnt + 1;
+		So_Mail = "<br><br> Serial Number " + cnt + "<br>";
+	itm_mail = "";
+		salesorder_id = so.getJSON("estimate_id");
+		So_list.add(salesorder_id);
+		salesorder_number = so.getJSON("estimate_number");
+		so_de = zoho.books.getRecordsByID("estimates","702134731",salesorder_id);
+		salesorder = so_de.get("estimate");
+		line_items = salesorder.get("line_items");
+		//info line_items;
+		for each  itm in line_items
+		{
+			Mail = "";
+			name = itm.get("name");
+			item_id = itm.get("item_id");
+			//info itm_id
+			if(!itm_id.contains(item_id))
+			{
+				itm_list.add(name);
+				itm_id.add(item_id);
+			}
+			Mail = item_id + "  " + name + "<br>";
+			//info Mail;
+			itm_mail = itm_mail + Mail;
+			//info So_Mail;
+		}
+		So_Mail = So_Mail + "EST ID - " + salesorder_id + " EST Number - " + salesorder_number + " EST Date- " + dt + "<br>" + itm_mail;
+		EMail = EMail + So_Mail;
+		// 		if(cnt == 2)
+		// 		{
+		// 			break;
+		// 		}
+	}
+		
+	}
+	has_more_page = get_so.get("page_context").get("has_more_page");
+	//info "has_more_page " +has_more_page;
+}
+sendmail
+[
+	from :zoho.adminuserid
+	to :"Jatin@insightcrew.com"
+	subject :"ESTImate Created From 22 JULY to 30 JULY"
+	message :EMail
+]
+sendmail
+[
+	from :zoho.adminuserid
+	to :"Jatin@insightcrew.com"
+	subject :"Unique item list and EST"
+	message :"EST LIST " + So_list.toString() + "<br> ITEM LIST" + itm_id.toString() + "<br> Item Name" + itm_list.toString()
+]
