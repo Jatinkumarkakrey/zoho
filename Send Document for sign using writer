@@ -1,0 +1,46 @@
+deal = zoho.crm.getRecordById("Deals",id);
+Account_Name = deal.getJSON("Account_Name").get("name");
+Contact_Name = deal.getJSON("Contact_Name");
+if(!Contact_Name.isNull())
+{
+	Contact_id = Contact_Name.get("id");
+	con = zoho.crm.getRecordById("Contacts",Contact_id.toLong());
+	Email = con.get("Email");
+	Contract_id = deal.get("Contract_id");
+	Subject1 = "Edible Maine Advertising Contract";
+	Message1 = "Thank you for advertising with Edible Maine. Please review and sign the attached Advertising Contract.";
+	Document_Name = "Advertising Contract " + Account_Name;
+
+	li = list();
+	mp = Map();
+	mp.put("recipient_1",Email);
+	mp.put("recipient_name",Account_Name);
+	li.add(mp);
+	data = Map();
+	data.put("recipients",li);
+	data.put("subject",Subject1);
+	data.put("message",Message1);
+	data.put("signed_document_name",Document_Name);
+	data.put("reminder_period",2);
+	data.put("expire_in",10);
+	//info data;
+	sen = invokeurl
+	[
+		url :"http://writer.zoho.com/writer/api/v1/documents/" + Contract_id + "/sign"
+		type :POST
+		parameters:data
+		connection:"zbooks"
+	];
+	info sen;
+	up = Map();
+	curr = zoho.currenttime;
+	curr = curr.toString("yyyy-MM-dd'T'HH:mm:ss-04:00");
+	up.put("Contract_Send_Date",curr);
+	info zoho.crm.updateRecord("Deals",id,up);
+	msg = "Contract send successfully!!!";
+}
+else
+{
+	msg = "Contact Name Missing";
+}
+return msg;
