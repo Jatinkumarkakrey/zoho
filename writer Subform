@@ -1,0 +1,62 @@
+deal = zoho.crm.getRecordById("Deals",id);
+//info deal;
+mp = Map();
+Insertion_Information = deal.getJSON("Insertion_Information");
+Account_Name = deal.getJSON("Account_Name");
+if(!Account_Name.isNull())
+{
+	Account_Name = Account_Name.getJSON("name");
+	mp.put("Account_Name",Account_Name);
+	info Account_Name;
+}
+Created_Time = deal.get("Created_Time").toTime("yyyy-MM-dd'T'HH:mm:ss").toString("MMM-dd-yyyy hh:mm a");
+mp.put("Created_Time",Created_Time);
+info Created_Time;
+l = list();
+for each  x in Insertion_Information
+{
+	Description = x.getJSON("Description");
+	Product = x.getJSON("Product").getJSON("name");
+	Insertion = x.getJSON("Insertion").getJSON("name");
+	Placement = x.getJSON("Placement");
+	Full_Rate = x.get("Full_Rate");
+	Charged_Rate = x.get("Charged_Rate");
+	Discount_Amount = x.get("Discount_Amount");
+	data = Map();
+	data.put("Insertion_Information.Insertion",Insertion);
+	data.put("Insertion_Information.Product",Product);
+	data.put("Insertion_Information.Description",Description);
+	data.put("Insertion_Information.Placement",Placement);
+	data.put("Insertion_Information.Full_Rate",Full_Rate);
+	data.put("Insertion_Information.Charged_Rate",Charged_Rate);
+	data.put("Insertion_Information.Discount_Amount",Discount_Amount);
+	l.add(data);
+}
+document_id = "l7wc27ccbd1f87ba0482b928afc3a739d28bc";
+// fieldInfo = zoho.writer.getMergeFields(document_id,"zbooks");
+// fieldsList = fieldInfo.getJSON("rl_fields").getJSON("fields");
+// for each f in fieldsList
+// {
+// 	info f;
+// }
+// data.put("Insertion_Information.Full_Rate",9000);
+// l = list();
+//
+// data.put("Insertion_Information.Insertion","Test");
+// data.put("Insertion_Information.Product","Test2");
+// data.put("Insertion_Information.Full_Rate",9000);
+// l.add(data);
+// mp = Map();
+mp.put("Insertion_Information",l);
+filename = "Advertising Contract " + Account_Name;
+output_settings = Map();
+output_settings.put("doc_name",filename);
+response_writer = zoho.writer.mergeAndStore(document_id,mp,output_settings,"zbooks");
+document_id = response_writer.get("document_id");
+document_url = response_writer.get("document_url");
+up = Map();
+up.put("Contract_id",document_id);
+up.put("Contract_Url",document_url);
+info zoho.crm.updateRecord("Deals",id,up);
+openUrl(document_url,"same window");
+return "Contract created successfully!!!";
