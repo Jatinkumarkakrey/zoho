@@ -1,0 +1,91 @@
+sal = zoho.crm.getRecordById("Sales_Orders",id);
+contact = sal.getJSON("Contact_Name");
+if(!contact.isNull())
+{
+	con_id = contact.getJSON("id");
+	con = zoho.crm.getRecordById("Contacts",con_id.toLong());
+	full_name = con.getJSON("First_Name") + " " + con.getJSON("Last_Name");
+	req_name = "Contract- " + full_name;
+	Email = con.getJSON("Email");
+	Contract = sal.getJSON("Contract");
+	if(!Contract.isNull())
+	{
+		attachment_Id = Contract.getJSON("attachment_Id");
+		client_id = "1000.HFFR1DTGY6ZR352ZGI8OBRH6CDKZZS";
+		client_secret = "3e1916d0383832775b0b224d60ae01e0f755325cc8";
+		refresh_token = "1000.0012ffbb0fd60bc2ca66d31794ac3e1c.573aa85502536089041ccd9bd842629a";
+		token_detail = invokeurl
+		[
+			url :"https://accounts.zoho.com/oauth/v2/token?refresh_token=" + refresh_token + "&grant_type=refresh_token&client_id=" + client_id + "&client_secret=" + client_secret + "&redirect_uri=https://developers.google.com/oauthplayground/"
+			type :POST
+		];
+		access_token = token_detail.get("access_token");
+		info access_token;
+		head = Map();
+		head.put("Authorization"," Zoho-oauthtoken " + access_token);
+		file = invokeurl
+		[
+			url :"https://www.zohoapis.com/crm/v2/Sales_Orders/" + id + "/Attachments/" + attachment_Id
+			type :GET
+			headers:head
+		];
+		info file;
+		dataMap = Map();
+		dataMap.put("requests",{"request_name":req_name});
+		requestMap = Map();
+		requestMap.put("data",dataMap);
+		// Perform create document task to upload the files
+		response = zoho.sign.createDocument(file,requestMap);
+		res_id = response.get("requests").get("request_id").toLong();
+		doc_id = response.get("requests").get("document_ids").get(0).get("document_id").toLong();
+		//  info response;
+		fieldsMap = Map();
+		fieldsMap.put("x_coord","402");
+		fieldsMap.put("field_type_id","143860000000000141");
+		fieldsMap.put("abs_height","20");
+		fieldsMap.put("field_category","image");
+		fieldsMap.put("field_label","Signature");
+		fieldsMap.put("is_mandatory","true");
+		fieldsMap.put("page_no","0");
+		fieldsMap.put("document_id",doc_id);
+		fieldsMap.put("field_name","Signature");
+		fieldsMap.put("field_type_name","Signature");
+		// Create a list to store all the fields that need to be inserted
+		fieldList = List();
+		fieldList.add(fieldsMap);
+		// Create a map to store the details of the first recipient
+		actionMap = Map();
+		actionMap.put("fields",fieldList);
+		actionMap.put("recipient_name",full_name);
+		actionMap.put("recipient_email",Email);
+		actionMap.put("action_type","SIGN");
+		actionMap.put("signing_order",0);
+		// Create a list to store all the recipients of the document
+		actionList = List();
+		actionList.add(actionMap);
+		requestMap = Map();
+		requestMap.put("request_name",req_name);
+		requestMap.put("actions",actionList);
+		dataMap = Map();
+		dataMap.put("data",{"requests":requestMap});
+		response = zoho.sign.submitRequest(res_id.toLong(),dataMap);
+		code = response.get("code");
+		if(code == 0)
+		{
+			msg = "Document sent for sign successfully!!";
+		}
+		else
+		{
+			msg = "There is some error , Please contact you developer!!";
+		}
+		info zoho.crm.updateRecord("Sales_Orders",id,{"Status":"Attente de confirmation"});
+		// get_file = invokeurl
+		// [
+		// 	url: "https://sign.zoho.com/api/v1/requests/143860000000015027"
+		// 	type: GET
+		// 	headers: head
+		// ];
+		// info get_file ;
+	}
+}
+return msg;
