@@ -9,7 +9,7 @@
 // curl_setopt($ch, CURLOPT_POST, TRUE);
 
 // curl_setopt($ch, CURLOPT_POSTFIELDS, "{
-//   \"api_key\": \"89f561a281d3aa5197b71a2e05f348f4b5e8262e0df6d718a876a20f98a30617\"
+//   \"api_key\": \"*******************************************************\"
 // }");
 
 // curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -37,7 +37,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 curl_setopt($ch, CURLOPT_HEADER, FALSE);
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-  "x-api-token: 79e6420f547a43a40a7cbc67b049505eedfd386c6db4dd19f50bcc75dddcbc31"
+  "x-api-token: ******************************************"
 ));
 
 $response = curl_exec($ch);
@@ -58,7 +58,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 curl_setopt($ch, CURLOPT_HEADER, FALSE);
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-  "x-api-token: 79e6420f547a43a40a7cbc67b049505eedfd386c6db4dd19f50bcc75dddcbc31"
+  "x-api-token: ***************************************************"
 ));
 
 $response = curl_exec($ch);
@@ -72,9 +72,9 @@ echo "<pre>";print_r(get_plans());
 
 function zoho_access ()
 {
-  $zoho_client_id ="1000.CZND6PV8Y2K6JTY7GVAZA81B4FDZNL";
-$zoho_secret_id ="8d544c9d963687f707ecd841ead9813598602423a5";
-$zoho_refresh_token ="1000.3d94464bab572fa025780fed65139eb0.7cadc6e89c9fb5181599b58d2c7a33f0";
+  $zoho_client_id ="1000.************************";
+$zoho_secret_id ="***************************************";
+$zoho_refresh_token ="1000.**************************.**************************";
 
 $zoho_access = curl_init();
 
